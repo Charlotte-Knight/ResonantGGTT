@@ -18,8 +18,10 @@ def assignSignalRegions(df, optim_results, score_name):
     df.loc[selection, "SR"] = i
   return df[df.SR!=-1]
 
-def writeOutputTree(mass, weight, process, cat_name, year, undo_lumi_scaling=False, scale_signal=False):
+def writeOutputTree(mass, weight, process, cat_name, year, undo_lumi_scaling=False, scale_signal=False, event=None):
   df = pd.DataFrame({"dZ": np.zeros(len(mass)), "CMS_hgg_mass": mass, "weight": weight})
+  if event is not None:
+    df["event"] = event
   #print(df)
   #assert len(df) >= 4, len(df)
 
@@ -45,7 +47,7 @@ def writeOutputTree(mass, weight, process, cat_name, year, undo_lumi_scaling=Fal
 def getYieldTable(df, proc_dict, path):
   reverse_proc_dict = {value:key for (key, value) in proc_dict.items()}
   procs = [reverse_proc_dict[proc_id] for proc_id in df.process_id.unique()]
-  procs.remove("Data") #blind yield table
+  #procs.remove("Data") #blind yield table
 
   #procs=["ZZ", "WW", "WZ", "DY"]
 
@@ -68,8 +70,8 @@ def getYieldTable(df, proc_dict, path):
   with open(path+".txt", "w") as f:
     f.write(table)
   with open(path+".tex", "w") as f:
-    f.write(yield_table.to_latex(float_format="%.4f"))
-  yield_table.to_csv(path+".csv", float_format="%.4f")
+    f.write(yield_table.to_latex(float_format="%.2f", column_format="l"+"|r"*(len(yield_table.columns))))
+  yield_table.to_csv(path+".csv", float_format="%.2f")
 
 def printDuplications(df):
   for process_id in df.process_id.unique():
@@ -80,6 +82,13 @@ def printDuplications(df):
       print(year, process_id)
       print(df[(df.process_id==process_id)&(df.year==year)&(df.event.isin(duplicates))].sort_values(by="event")[["Diphoton_mass", "event"]])
 
+def halveLastSR(optim_results, keep_left=True):
+  for entry in optim_results:
+    if keep_left:
+      entry["category_boundaries"][1] = entry["category_boundaries"][1] / 2
+    else:
+      entry["category_boundaries"][0] = entry["category_boundaries"][1] / 2
+
 def main(args):
   if args.batch:
     common.submitToBatch([sys.argv[0]] + common.parserToList(args), extra_memory=args.batch_slots)
@@ -89,6 +98,9 @@ def main(args):
     optim_results = json.load(f)
   with open(args.summary_input, "r") as f:
     proc_dict = json.load(f)["sample_id_map"]
+
+  #halveLastSR(optim_results, False)
+  print(optim_results[0])
 
   columns = common.getColumns(args.parquet_input)
   columns = list(filter(lambda x: x[:5] != "score", columns))
@@ -111,7 +123,7 @@ def main(args):
 
   for entry in optim_results:
     MX, MY = common.get_MX_MY(entry["sig_proc"])
-    #if MY != 90: continue
+    #if (MX != 600) or (MY != 90): continue
     #print(MX)
 
     print("Tagging")
@@ -132,7 +144,7 @@ def main(args):
         if args.dropLastCat: 
           SRs = SRs[:-1]
 
-        if (SRs != [i for i in range(len(SRs))]).all():
+        if (SRs != [i for i in range(len(SRs))]).any():
           print(f"Missing categories for MX={MX}, MY={MY}")
           print("Will drop this mass point")
           print(np.unique(data.SR, return_counts=True))
@@ -145,11 +157,12 @@ def main(args):
           if args.combineYears and (i==0):
             mgg = data[(data.SR==SR)].Diphoton_mass
             w = data[(data.SR==SR)].weight
+            event = data[(data.SR==SR)].event
             sr = tools.get_sr(entry["sig_proc"])
             print("Data", cat_name, year)
             print(sum((mgg <= sr[0]) | (mgg >= sr[1])), flush=True)
 
-            writeOutputTree(mgg, w, "Data", cat_name, "combined")
+            writeOutputTree(mgg, w, "Data", cat_name, "combined", event=event)
           elif not args.combineYears:
             writeOutputTree(data[(data.SR==SR)&(data.year==year)].Diphoton_mass, data[(data.SR==SR)&(data.year==year)].weight, "Data", cat_name, year)
 

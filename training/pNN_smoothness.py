@@ -55,10 +55,7 @@ def loadDataFrame(train_features):
 with open(sys.argv[3], "rb") as f:
   model = pickle.load(f)
 
-#features = model["transformer"].numeric_features + model["transformer"].categorical_features
-
 features = common.train_features["important_17_corr"] + ["MX", "MY"]
-#features = ['SubleadPhoton_pt_mgg', 'SubleadPhoton_lead_lepton_dR', 'diphoton_met_dPhi', 'b_jet_1_btagDeepFlavB', 'Diphoton_dR', 'dilep_leadpho_mass', 'jet_1_pt', 'Diphoton_deta', 'SubleadPhoton_genPartFlav', 'LeadPhoton_pt_mgg', 'reco_MggtauMET_mgg', 'Diphoton_dPhi', 'Diphoton_lead_lepton_dphi', 'lead_lepton_eta', 'Diphoton_lead_lepton_deta', 'ditau_met_dPhi', 'MET_pt', 'Diphoton_sublead_lepton_dphi', 'ditau_pt', 'LeadPhoton_lead_lepton_dR', 'SubleadPhoton_mvaID', 'Diphoton_pt_mgg', 'Diphoton_lead_lepton_dR', 'reco_MX_MET', 'lead_lepton_pt', 'ditau_mass', 'lead_lepton_mass', 'Diphoton_min_mvaID', 'LeadPhoton_genPartFlav', 'ditau_dR', 'Diphoton_ditau_dphi', 'reco_MX', 'jet_2_pt', 'Diphoton_helicity', 'MX', 'MY'] + ['category', 'n_taus']
 df, proc_dict = loadDataFrame(features)
 
 #select data
@@ -68,19 +65,8 @@ mx = np.arange(260, 1000)
 
 pd.options.mode.chained_assignment = None 
 
-# scores = [getScores(model, df.iloc[0:1], features, m).sum() for m in mx]
-# plt.plot(mx, scores)
-# plt.savefig("mx_smooth_1.png")
-# plt.clf()
-
-# scores = [getScores(model, df.iloc[0:100], features, m).sum() for m in mx]
-# plt.plot(mx, scores)
-# plt.savefig("mx_smooth_100.png")
-# plt.clf()
-
-# scores = [getScores(model, df, features, m).sum() for m in mx]
-# plt.plot(mx, scores)
-# plt.savefig("mx_smooth_all.png")
+score_260 = getScores(model, df, features, 260)
+df = df[score_260>0.9]
 
 scores = np.array([getScores(model, df, features, m)for m in mx]).T
 
@@ -88,6 +74,12 @@ dx = np.diff(scores, axis=1)
 turning_points = np.sum(dx[:, 1:] * dx[:, :-1] < 0, axis=1)
 
 df["turning_points"] = turning_points
+
+
+plt.hist2d(np.mean(scores, axis=1), turning_points)
+plt.colorbar()
+plt.savefig("smoothness/score_hist2d.png")
+plt.clf()
 
 corr = df.corr(method="spearman")["turning_points"].sort_values()
 print(corr)
@@ -97,10 +89,15 @@ for point in np.unique(df.turning_points):
   plt.savefig("smoothness/corr%d.png"%point)
   plt.clf()
 
-reco_mx = df["reco_MggtauMET_mgg"].to_numpy()[turning_points >= 4]
-scores = scores[turning_points >= 4]
-turning_points = turning_points[turning_points >= 4]
+reco_mx = df["reco_MggtauMET_mgg"].to_numpy()[turning_points >= 2]
+scores = scores[turning_points >= 2]
+turning_points = turning_points[turning_points >= 2]
+print(len(df))
 print(len(scores))
+
+plt.hist(scores.flatten(), bins=100, range=(0, 1))
+plt.savefig("smoothness/score_hist.png")
+plt.clf()
 
 for i, score in enumerate(scores):
   if i > 100: break

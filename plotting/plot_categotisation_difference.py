@@ -26,17 +26,17 @@ n_bkg = []
 
 with open(sys.argv[1], "r") as f:
   lines = f.readlines()
-for i in range(0, len(lines), 9):
+for i in range(0, len(lines), 7):
   n_bkg_tmp = []
-  for j in range(9):
-    if j==1:
+  for j in range(7):
+    if j==2:
       print(lines[i+j].split(" ")[0])
       best_limit.append(float(lines[i+j].split(" ")[0]))
       boundaries.append(getBoundaries(lines[i+j]))
-    elif j==2:
+    elif j==3:
       print(lines[i+j].split(",")[0][1:])
       cat_limit.append(float(lines[i+j].split(",")[0][1:]))
-    elif j>2:
+    elif j>4:
       n_bkg_tmp.append(int(lines[i+j].split(" ")[2]))
   n_bkg.append(n_bkg_tmp)
 
@@ -46,6 +46,11 @@ cat_limit = cat_limit[1:] + [cat_limit[0]]
 boundaries = boundaries[1:] + [boundaries[0]]
 n_bkg = n_bkg[1:] + [n_bkg[0]]
 
+best_limit = np.array(best_limit) * 2
+cat_limit = np.array(cat_limit) * 2
+
+print(list(100*abs(best_limit-cat_limit)/best_limit))
+
 plt.plot(masses, best_limit, label="Absolute optimal")
 plt.plot(masses, cat_limit, label=r"Using $m_X=280$ cats")
 plt.legend()
@@ -54,20 +59,20 @@ plt.ylabel("Approximate 95% CL limit")
 plt.savefig("cat_optimal.pdf")
 plt.clf()
 
-boundaries = np.array(boundaries)
-n_bkg = np.array(n_bkg)
+# boundaries = np.array(boundaries)
+# n_bkg = np.array(n_bkg)
 
-for i in range(1, 6):
-  plt.plot(masses, boundaries[:, i], label=str(i))
-  plt.xlabel(r"$m_X$")
-  plt.ylabel("Boundary %d"%i)
-plt.legend()
-plt.savefig("boundary_%d.png"%i)
-plt.clf()
+# for i in range(1, 3):
+#   plt.plot(masses, boundaries[:, i], label=str(i))
+#   plt.xlabel(r"$m_X$")
+#   plt.ylabel("Boundary %d"%i)
+# plt.legend()
+# plt.savefig("boundary_%d.png"%i)
+# plt.clf()
 
-for i in range(5):
-  plt.plot(masses, n_bkg[:, i])
-  plt.xlabel(r"$m_X$")
-  plt.ylabel("N bkg in sidebands %d"%i)
-  plt.savefig("n_bkg_%d.png"%i)
-  plt.clf()
+# for i in range(3):
+#   plt.plot(masses, n_bkg[:, i])
+#   plt.xlabel(r"$m_X$")
+#   plt.ylabel("N bkg in sidebands %d"%i)
+#   plt.savefig("n_bkg_%d.png"%i)
+#   plt.clf()

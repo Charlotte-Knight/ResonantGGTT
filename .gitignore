@@ -137,3 +137,6 @@ dmypy.json
 *.model
 batch/
 *.pdf
+new_matplotlib_env/
+Inputs*/
+Outputs*/

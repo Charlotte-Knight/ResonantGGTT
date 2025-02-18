@@ -72,6 +72,7 @@ def loadDataFrame(args, train_features):
     proc_dict = json.load(f)['sample_id_map']
 
   sig_procs_to_keep = set(args.train_sig_procs + args.eval_sig_procs)
+  #sig_procs_to_keep.add("NMSSM_XYH_Y_gg_H_WW_MX_300_MY_100")
 
   sig_ids = [getProcId(proc_dict, proc) for proc in sig_procs_to_keep]
   bkg_ids = [getProcId(proc_dict, proc) for proc in common.bkg_procs["all"]]
@@ -171,14 +172,18 @@ def addScores(args, model, train_features, train_df, test_df, data, MX_MY_to_eva
   if TRACK_MEMORY:  log_memory()
   pd.options.mode.chained_assignment = None
 
-  dfs = [train_df, test_df, data]
+  if len(data) > 0:
+    dfs = [train_df, test_df, data]
+  else:
+    dfs = [train_df, test_df]
   
   #evaluate at nominal mass points
   if MX_MY_to_eval is None:
     MX_MY_to_eval = []
     for sig_proc in args.eval_sig_procs:
       MX, MY = common.get_MX_MY(sig_proc)
-      MX_MY_to_eval.append([MX, MY])
+      if (MX, MY) not in MX_MY_to_eval:
+        MX_MY_to_eval.append((MX, MY))
 
   for df in dfs:
     df.loc[:, "MX"] = MX_MY_to_eval[0][0]
@@ -197,6 +202,7 @@ def addScores(args, model, train_features, train_df, test_df, data, MX_MY_to_eva
       df["score_%s"%sig_proc] = all_predictions[i][:,1]
       assert (df["score_%s"%sig_proc] < 0).sum() == 0
       assert (df["score_%s"%sig_proc] > 1).sum() == 0
+      assert (df["score_%s"%sig_proc].isna()).sum() == 0
 
   pd.options.mode.chained_assignment = "warn"
   if TRACK_MEMORY:  log_memory()
@@ -349,10 +355,12 @@ def evaluatePlotAndSave(args, proc_dict, model, train_features, train_df, test_d
       train_auc, test_auc = doROC(args, train_df, test_df, sig_proc, proc_dict)
       metrics["AUC/%d_%d_train_auc"%common.get_MX_MY(sig_proc)] = train_auc
       metrics["AUC/%d_%d_test_auc"%common.get_MX_MY(sig_proc)] = test_auc
+    print(1)
     if hasattr(model["classifier"], "addHyperparamMetrics"):
      model["classifier"].addHyperparamMetrics(metrics)
-
+    print(2)
     if hasattr(model["classifier"], "train_loss"):
+      print(3)
       print(">> Plotting loss curves")
       train_loss = model["classifier"].train_loss
       validation_loss = model["classifier"].validation_loss
@@ -361,7 +369,7 @@ def evaluatePlotAndSave(args, proc_dict, model, train_features, train_df, test_d
         plotLoss(train_loss[:,i], validation_loss[:,i], os.path.join(args.outdir, proc))
   
   #make sure the writer is closed at this point
-  if hasattr(model["classifier"], "writer"):
+  if hasattr(model["classifier"], "writer") and model["classifier"] is not None:
     model["classifier"].writer.close()
 
   if args.only_ROC: 
@@ -599,14 +607,23 @@ def mergeBatchSplit(outdir, outputName):
   dfs = []  
 
   for i, f in enumerate(parquet_files):
+    print(f, flush=True)
     path = os.path.join(parquet_dir, f)
     if i == 0:
       dfs.append(pd.read_parquet(path))
+      rnd_idx_drop = np.random.choice(dfs[-1].index, size=int(len(dfs[-1])/2), replace=False)
+      dfs[-1].drop(index=rnd_idx_drop, inplace=True)
+      dfs[-1].loc[:, "weight"] *= 2
     else:
       score_columns = list(filter(lambda x:"score" in x, common.getColumns(path)))
       dfs.append(pd.read_parquet(path, columns=score_columns))
+      dfs[-1].drop(index=rnd_idx_drop, inplace=True)
+      #assert ((dfs[-1].index == dfs[0].index).all())
+      
 
+  print("Concating", flush=True)
   merged_df = pd.concat(dfs, axis=1)
+  print("Outputting", flush=True)
   merged_df.to_parquet(os.path.join(outdir, outputName))
 
 def start(parser, args=None):

@@ -22,7 +22,7 @@ if __name__=="__main__":
   print("ROC2 Test AUC: %.4f"%roc2["test_auc"])
   print("AUC difference: %.4f"%(roc2["test_auc"]-roc1["test_auc"]))
   #for bkg_eff in [0.5, 0.2, 0.1, 0.05, 0.01, 0.001]:
-  for bkg_eff in [0.1, 0.01]:
+  for bkg_eff in [0.1, 0.01, 0.001]:
     print("At %.4f bkg efficiency"%bkg_eff)
     sig_eff_1 = getSigEff(roc1, bkg_eff)
     sig_eff_2 = getSigEff(roc2, bkg_eff)

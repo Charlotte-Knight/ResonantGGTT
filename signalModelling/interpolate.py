@@ -56,6 +56,9 @@ def interp(x, y, z, kind='cubic', bounds_error=True):
 def fitSignalModel(df, mx, outdir, my=125, fit_range_my=False, make_plots=False):  
   if sum((df.MX==mx)&(df.MY==my)) < 100:
     #find closest mass with > 100 events
+    #print(mx, my)
+    #print(df)
+    #print(df[df.MY==my])
     possible_masses, counts = np.unique(df[df.MY==my].MX, return_counts=True)
     possible_masses_100 = possible_masses[counts>=100]
     if len(possible_masses_100) > 0:
@@ -205,7 +208,9 @@ def deriveModels(original_df, proc_dict, optim_results, original_outdir, make_pl
       for SR in range(len(entry["category_boundaries"])-1):
         print(SR, flush=True)
         df = df_tagged[df_tagged.SR==SR]
-        if do_same_score_interp: df_same_score = df_tagged_same_score[df_tagged_same_score.SR==SR]
+        if do_same_score_interp: 
+          df_same_score = df_tagged_same_score[df_tagged_same_score.SR==SR]
+          assert len(df_same_score) != 0, print(MX, MY, SR)
 
         outdir = os.path.join(original_outdir, str(year), str(SR), "%d_%d"%(MX,MY))
         
@@ -213,6 +218,7 @@ def deriveModels(original_df, proc_dict, optim_results, original_outdir, make_pl
 
         #set tiny norms to zero
         norm_closest = df.loc[(df.MX==closest_mx)&(df.MY==closest_my), "weight"].sum()/common.lumi_table[year]
+        print(norm_closest)
         if norm_closest < 0.001:
           popt = np.array([1, 0.0, 2, 1.2, 10, 1.2, 10]) #doesn't matter but give sensible numbers anyway
           #models[str(year)][str(SR)]["%d_%d"%(MX, MY)] = {"%d_%d"%tuple(to_fit_masses[i]):{"norm": 0.0, "norm_err": 0.0} for i in range(len(to_fit_masses))}
@@ -297,6 +303,9 @@ def deriveModels(original_df, proc_dict, optim_results, original_outdir, make_pl
           #find the gradients
           my_low, my_high = min(to_fit_masses_same_score[:,1]), max(to_fit_masses_same_score[:,1])
           my_mid = closest_my
+          print(to_fit_masses_same_score)
+          print(closest_my)
+          print(my_low, my_mid, my_high)
           sc_dict = models[str(year)][str(SR)]["%d_%d"%(MX, MY)]["same_score"]
           #scale norm variations from MC used to calculate gradients to actual norm for the mass point being probed
           norm_sf = sc_dict["%d_%d"%(mx,my_mid)]["norm"] / models[str(year)][str(SR)]["%d_%d"%(MX, MY)]["this mass"]["norm"] 
@@ -398,7 +407,7 @@ def mergeBatchSplit(outdir, mass_points):
         os.makedirs(os.path.join(outdir, year), exist_ok=True)
         for cat in merged_model[year]:
           os.makedirs(os.path.join(outdir, year, cat, mass), exist_ok=True)
-          os.system("cp %s/* %s"%(os.path.join(outdir, "batch_split", mass, year, cat, mass), os.path.join(outdir, year, cat, mass)))
+          #os.system("cp %s/* %s"%(os.path.join(outdir, "batch_split", mass, year, cat, mass), os.path.join(outdir, year, cat, mass)))
 
           merged_model[year][cat][mass] = model[year][cat][mass]
       
@@ -406,7 +415,7 @@ def mergeBatchSplit(outdir, mass_points):
       os.makedirs(os.path.join(outdir, "Interpolation_Check"), exist_ok=True)
       example_sig_proc = os.listdir(os.path.join(outdir, "batch_split", mass, "Interpolation_Check"))[0]
       sig_proc = common.get_sig_proc(example_sig_proc, int(mass.split("_")[0]), int(mass.split("_")[1]))
-      os.system("cp -r %s %s"%(os.path.join(outdir, "batch_split", mass, "Interpolation_Check", sig_proc), os.path.join(outdir, "Interpolation_Check", sig_proc)))
+      #os.system("cp -r %s %s"%(os.path.join(outdir, "batch_split", mass, "Interpolation_Check", sig_proc), os.path.join(outdir, "Interpolation_Check", sig_proc)))
   
   with open(os.path.join(outdir, "model.json"), "w") as f:
     json.dump(merged_model, f, indent=4, sort_keys=True, cls=common.NumpyEncoder)
@@ -433,7 +442,6 @@ def main(args):
       mass_points_copy = args.mass_points.copy()
       outdir_copy = copy.copy(args.outdir)
       for mass in mass_points_copy:
-        if mass not in ["300,141","311,150","312,141","400,237","412,250"]: continue
         args.mass_points = [mass]
         args.outdir = os.path.join(outdir_copy, "batch_split", mass.replace(",","_"))
         common.submitToBatch([sys.argv[0]] + common.parserToList(args), extra_memory=args.batch_slots)

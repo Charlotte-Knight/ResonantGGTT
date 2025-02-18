@@ -166,9 +166,35 @@ def deriveYieldSystematic(df, systematic, mass):
   mx = int(mass.split("_")[0])
   my = int(mass.split("_")[1])
 
-  central = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_central"%systematic].sum()
-  up = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_up"%systematic].sum()
-  down = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_down"%systematic].sum()
+  # if "idDeepTauVSjet" in systematic:
+  #   up = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_up"%systematic].mean()
+  #   down = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_down"%systematic].mean()
+  #   variation_mean = variation_up = 1 + abs(1 - up)
+  #   variation_down = 1 + abs(1 - down)
+
+  # else:
+  #   central_name = "weight_%s_central"%systematic
+
+  #   central = df.loc[(df.MX==mx)&(df.MY==my), central_name].sum()
+  #   up = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_up"%systematic].sum()
+  #   down = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_down"%systematic].sum()
+
+  #   if central == 0:
+  #     variation_mean = 1.0
+  #   else:
+  #     variation_up = 1 + abs(1 - up/central)
+  #     variation_down = 1 + abs(1 - down/central)
+  #     variation_mean = (variation_up + variation_down)/2
+
+  if "idDeepTauVSjet" in systematic:
+    central = df.loc[(df.MX==mx)&(df.MY==my), "weight_idDeepTauVSjet_central"].sum()
+    up = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_up"%systematic].sum()
+    down = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_down"%systematic].sum()
+  else:
+    central_name = "weight_%s_central"%systematic
+    central = df.loc[(df.MX==mx)&(df.MY==my), central_name].sum()
+    up = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_up"%systematic].sum()
+    down = df.loc[(df.MX==mx)&(df.MY==my), "weight_%s_down"%systematic].sum()
 
   if central == 0:
     variation_mean = 1.0
@@ -191,8 +217,10 @@ def getYieldSystematicsNames(original_df):
   rename_btag_systematics(original_df)
   yield_systematics = []
   for col in original_df.columns:
-    if "central" in col and ("weight_central" not in col):
+    if "up" in col and ("weight_central" not in col):
       yield_systematics.append("_".join(col.split("_")[1:-1]))
+
+  print(yield_systematics)
 
   return yield_systematics
 
@@ -248,7 +276,8 @@ def deriveParquetShapeSystematics(dfs, systematic, mass):
 
 def deriveSystematics(dfs, masses, original_outdir):
   yield_systematics = getYieldSystematicsNames(dfs["nominal"])
-  parquet_yield_systematics = ["JER", "JES", "MET_JES", "MET_Unclustered", "Muon_pt", "Tau_pt"]
+  #parquet_yield_systematics = ["JER", "JES", "MET_JES", "MET_Unclustered", "Muon_pt", "Tau_pt"]
+  parquet_yield_systematics = ['JER', 'Jet_jesAbsolute', 'Jet_jesAbsolute_year', 'Jet_jesBBEC1', 'Jet_jesBBEC1_year', 'Jet_jesEC2', 'Jet_jesEC2_year', 'Jet_jesFlavorQCD', 'Jet_jesHF', 'Jet_jesHF_year', 'Jet_jesRelativeBal', 'Jet_jesRelativeSample_year', 'MET_jesAbsolute', 'MET_jesAbsolute_year', 'MET_jesBBEC1', 'MET_jesBBEC1_year', 'MET_jesEC2', 'MET_jesEC2_year', 'MET_jesFlavorQCD', 'MET_jesHF', 'MET_jesHF_year', 'MET_jesRelativeBal', 'MET_jesRelativeSample_year', 'MET_Unclustered', 'Muon_pt', 'Tau_pt']
   parquet_shape_systematics = ["fnuf", "material", "scale", "smear"]
   
   systematics = {}
@@ -482,7 +511,6 @@ def main(args):
       mass_points_copy = args.mass_points.copy()
       outdir_copy = copy.copy(args.outdir)
       for mass in mass_points_copy:
-        if mass not in ["300,141","311,150","312,141","400,237","412,250"]: continue
         args.mass_points = [mass]
         args.outdir = os.path.join(outdir_copy, "batch_split", mass.replace(",","_"))
         common.submitToBatch([sys.argv[0]] + common.parserToList(args), extra_memory=args.batch_slots)

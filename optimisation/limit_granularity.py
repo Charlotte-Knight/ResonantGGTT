@@ -202,6 +202,15 @@ def main(args):
   all_masses += [(mx, my) for my in interpoints_my.keys() for mx in interpoints_my[my]]
   all_masses = list(set(all_masses)) #remove duplicates
 
+  plt.scatter([m[0] for m in nominal_masses], [m[1] for m in nominal_masses], marker='.')
+  plt.scatter([m[0] for m in nominal_masses], [m[1] for m in nominal_masses], marker='.', label="Nominal masses (N=%d)"%len(nominal_masses))
+  plt.ylim(top=(plt.ylim()[0] + 1.2*(plt.ylim()[1] - plt.ylim()[0])))
+  plt.legend(ncol=1)
+  plt.xlabel(r"$m_X$")
+  plt.ylabel(r"$m_Y$")
+  plt.savefig(os.path.join(args.outdir, "final_granularity_%s_nominal.pdf"%str(args.max_loss).replace(".","p")))
+  plt.clf()
+
   plt.scatter([m[0] for m in all_masses], [m[1] for m in all_masses], marker='.', label="All masses (N=%d)"%len(all_masses))
   plt.scatter([m[0] for m in nominal_masses], [m[1] for m in nominal_masses], marker='.', label="Nominal masses (N=%d)"%len(nominal_masses))
   plt.ylim(top=(plt.ylim()[0] + 1.2*(plt.ylim()[1] - plt.ylim()[0])))

@@ -6,6 +6,7 @@ import os
 def loadSummaries(args):
   summaries = []
   for summary_path in args.summary_input:
+    print(summary_path)
     with open(summary_path, "r") as f:
       summaries.append(json.load(f)["sample_id_map"])
 
@@ -14,6 +15,7 @@ def loadSummaries(args):
 def loadDataFrames(args):
   dfs = []
   for parquet_path in args.parquet_input:
+    print(parquet_path)
     dfs.append(pd.read_parquet(parquet_path))
 
   return dfs
@@ -43,25 +45,41 @@ def removeExcludedProcesses(dfs, summaries, args):
 
   return dfs, summaries
 
+def scaleDataFrames(dfs, args):
+  print("Scaling")
+  for i, df in enumerate(dfs):
+    df.loc[:, "weight_central"] *= args.scale[i]
+
 def mergeDataFrames(args):
   summaries = loadSummaries(args)
   dfs = loadDataFrames(args)
+  scaleDataFrames(dfs, args)
 
   dfs, summaries = removeExcludedProcesses(dfs, summaries, args)
-  dfs = idToName(dfs, summaries)
+  #dfs = idToName(dfs, summaries)
 
   merged_summary = {}
   for summary in summaries: merged_summary.update(summary)
 
-  if len(merged_summary.keys()) == sum([len(summary.keys()) for summary in summaries]): #no conflict
-    print(">> No overlapping process names")
-    merged_df = pd.concat(dfs)
-    merged_summary = {process:i for i, process in enumerate(merged_df.process_id.unique())}
-  else:
-    print("Have not implemented a way to deal with conflicting process names yet. Script will now exit.")
-    exit()
+  # if len(merged_summary.keys()) == sum([len(summary.keys()) for summary in summaries]): #no conflict
+  #   print(">> No overlapping process names")
+  #   print("Merging")
+  #   merged_df = pd.concat(dfs, ignore_index=True)
+    
+  #   all_procs = list(merged_df.process_id.unique())
+  #   if "Data" in all_procs:
+  #     all_procs.remove("Data")
+  #   all_procs = sorted(all_procs)
+  #   merged_summary = {process:i+1 for i, process in enumerate(all_procs)}
+  #   if "Data" in merged_df.process_id.unique():
+  #     merged_summary["Data"] = 0 
+  # else:
+  #   print("Have not implemented a way to deal with conflicting process names yet. Script will now exit.")
+  #   exit()
 
-  merged_df = nameToId(merged_df, merged_summary)
+  merged_df = pd.concat(dfs, ignore_index=True)
+
+  #merged_df = nameToId(merged_df, merged_summary)
 
   merged_df.to_parquet(args.parquet_output)
   with open(args.summary_output, "w") as f:
@@ -77,18 +95,21 @@ if __name__=="__main__":
 
   parser.add_argument('--exclude-procs', '-e', type=str, nargs='+', default=[], help="List of processes to not include in the merging, e.g. Diphoton TTGamma ...")
 
-  parser.add_argument('--force', '-f', default=False, action="store_true", help="Overwrite output parquet and summary files without asking permission.")
+  parser.add_argument('--batch', action="store_true")
+
+  parser.add_argument('--scale', type=float, nargs='+', default=None)
 
   args = parser.parse_args()
 
-  if os.path.exists(args.parquet_output):
-    if input("%s already exists. Should we continue anyway? (y/n): "%args.parquet_output) == "n":
-      exit()
-  if os.path.exists(args.summary_output):
-    if input("%s already exists. Should we continue anyway? (y/n): "%args.summary_output) == "n":
-      exit()
+  if args.scale is None:
+    args.scale = [1.0 for each in args.parquet_input]
 
-  assert len(args.parquet_input) == len(args.summary_input)
+  assert len(args.scale) == len(args.parquet_input) == len(args.summary_input), print(args.parquet_input, args.summary_input)
 
-  mergeDataFrames(args)
+  if args.batch:
+    import common
+    import sys
+    common.submitToBatch([sys.argv[0]] + common.parserToList(args), extra_memory=2)
+  else:
+    mergeDataFrames(args)
 

@@ -31,24 +31,24 @@ def getContributions(sig_proc, no_veto_n, no_veto_sumw, veto_n, veto_sumw):
 
   return pd.DataFrame(contributions)  
 
-# with open("Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson/CatOptim/optim_results.json") as f:
-#   optim_results = json.load(f)
-with open("Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_no_1tau/CatOptim/optim_results.json") as f:
+with open("Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson/CatOptim/optim_results.json") as f:
   optim_results = json.load(f)
+# with open("Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_no_1tau/CatOptim/optim_results.json") as f:
+#   optim_results = json.load(f)
 
 xs = pd.read_csv("Outputs_Sep/NMSSM_Y_gg_Low_Mass/Limits_xs_br/param_test_results.csv", index_col=0)
 
 files = list(filter(lambda x: "csv" in x, os.listdir("Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson/yieldTables_n")))
 
-# veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson/yieldTables_n/{f}", index_col=0) for f in files}
-# veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson/yieldTables_sumw/{f}", index_col=0) for f in files}
-# no_veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto/yieldTables_n/{f}", index_col=0) for f in files}
-# no_veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto/yieldTables_sumw/{f}", index_col=0) for f in files}
+veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson/yieldTables_n/{f}", index_col=0) for f in files}
+veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson/yieldTables_sumw/{f}", index_col=0) for f in files}
+no_veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto/yieldTables_n/{f}", index_col=0) for f in files}
+no_veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto/yieldTables_sumw/{f}", index_col=0) for f in files}
 
-veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_no_1tau/yieldTables_n/{f}", index_col=0) for f in files}
-veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_no_1tau/yieldTables_sumw/{f}", index_col=0) for f in files}
-no_veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto_no_1tau/yieldTables_n/{f}", index_col=0) for f in files}
-no_veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto_no_1tau/yieldTables_sumw/{f}", index_col=0) for f in files}
+# veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_no_1tau/yieldTables_n/{f}", index_col=0) for f in files}
+# veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_no_1tau/yieldTables_sumw/{f}", index_col=0) for f in files}
+# no_veto_n = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto_no_1tau/yieldTables_n/{f}", index_col=0) for f in files}
+# no_veto_sumw = {f.split(".")[0]: pd.read_csv(f"Outputs_Sep/NMSSM_Y_gg_low_mass_DY_Diboson_InvVeto_no_1tau/yieldTables_sumw/{f}", index_col=0) for f in files}
 
 for f in files:
   sig_proc = f.split(".")[0]

@@ -76,7 +76,7 @@ def deriveModels(dfs, proc_dict, optim_results, original_outdir, make_plots=Fals
   if systematics:
     systematics = {str(year):{str(SR):{} for SR in range(nSR)} for year in np.unique(dfs["nominal"].year)}
     yield_systematics = syst.getYieldSystematicsNames(dfs["nominal"])
-    parquet_yield_systematics = ["JER", "JES", "MET_JES", "MET_Unclustered", "Muon_pt", "Tau_pt"]
+    parquet_yield_systematics = ['JER', 'Jet_jesAbsolute', 'Jet_jesAbsolute_year', 'Jet_jesBBEC1', 'Jet_jesBBEC1_year', 'Jet_jesEC2', 'Jet_jesEC2_year', 'Jet_jesFlavorQCD', 'Jet_jesHF', 'Jet_jesHF_year', 'Jet_jesRelativeBal', 'Jet_jesRelativeSample_year', 'MET_jesAbsolute', 'MET_jesAbsolute_year', 'MET_jesBBEC1', 'MET_jesBBEC1_year', 'MET_jesEC2', 'MET_jesEC2_year', 'MET_jesFlavorQCD', 'MET_jesHF', 'MET_jesHF_year', 'MET_jesRelativeBal', 'MET_jesRelativeSample_year', 'MET_Unclustered', 'Muon_pt', 'Tau_pt']
     parquet_shape_systematics = ["fnuf", "material", "scale", "smear"]
 
   for year in dfs["nominal"].year.unique():
@@ -267,7 +267,7 @@ def mergeBatchSplit(outdir, mass_points):
         os.makedirs(os.path.join(outdir, year), exist_ok=True)
         for cat in merged_model[year]:
           os.makedirs(os.path.join(outdir, year, cat, mass), exist_ok=True)
-          os.system("cp %s/* %s"%(os.path.join(outdir, "batch_split", mass, year, cat, mass), os.path.join(outdir, year, cat, mass)))
+          #os.system("cp %s/* %s"%(os.path.join(outdir, "batch_split", mass, year, cat, mass), os.path.join(outdir, year, cat, mass)))
 
           merged_model[year][cat][mass] = model[year][cat][mass]
           merged_systematics[year][cat][mass] = systematics[year][cat][mass]

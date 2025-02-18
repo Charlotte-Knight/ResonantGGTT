@@ -466,6 +466,7 @@ class ParamNN(ParamModel):
     
     with tqdm(range(self.hyperparams["max_epochs"])) as t:
       for i_epoch in t:
+        print(i_epoch)
         self.model.train()
         for batch_X, batch_y, batch_w in tqdm(self.getBatches(Xt, yt, wt, self.hyperparams["batch_size"], shuffle=True, weighted=True, epoch_size=epoch_size), leave=False):
           optimizer.zero_grad()
@@ -560,6 +561,9 @@ class ParamNN(ParamModel):
     return all_predictions
 
   def addHyperparamMetrics(self, metrics):
+    if self.writer is None:
+      return None
+
     exp, ssi, sei = hparams(self.hyperparams, metric_dict=metrics)
     self.writer.file_writer.add_summary(exp)                 
     self.writer.file_writer.add_summary(ssi)                 

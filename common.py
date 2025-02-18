@@ -1,4 +1,5 @@
 import os
+import htcondor
 
 # get LOW_MASS_MODE from environment variable if exists, otherwise default to hard-coded value
 LOW_MASS_MODE = os.getenv("LOW_MASS_MODE")
@@ -39,13 +40,11 @@ category_map = {
 }
 
 sig_procs = {
-  "Graviton": ['GluGluToBulkGravitonToHHTo2G2Tau_M-260', 'GluGluToBulkGravitonToHHTo2G2Tau_M-270', 'GluGluToBulkGravitonToHHTo2G2Tau_M-280', 'GluGluToBulkGravitonToHHTo2G2Tau_M-290', 'GluGluToBulkGravitonToHHTo2G2Tau_M-300', 'GluGluToBulkGravitonToHHTo2G2Tau_M-320', 'GluGluToBulkGravitonToHHTo2G2Tau_M-350', 'GluGluToBulkGravitonToHHTo2G2Tau_M-400', 'GluGluToBulkGravitonToHHTo2G2Tau_M-450', 'GluGluToBulkGravitonToHHTo2G2Tau_M-500', 'GluGluToBulkGravitonToHHTo2G2Tau_M-550', 'GluGluToBulkGravitonToHHTo2G2Tau_M-600', 'GluGluToBulkGravitonToHHTo2G2Tau_M-650', 'GluGluToBulkGravitonToHHTo2G2Tau_M-700', 'GluGluToBulkGravitonToHHTo2G2Tau_M-750', 'GluGluToBulkGravitonToHHTo2G2Tau_M-800', 'GluGluToBulkGravitonToHHTo2G2Tau_M-900', 'GluGluToBulkGravitonToHHTo2G2Tau_M-1000'],
-  "Radion": ['GluGluToRadionToHHTo2G2Tau_M-260', 'GluGluToRadionToHHTo2G2Tau_M-270', 'GluGluToRadionToHHTo2G2Tau_M-280', 'GluGluToRadionToHHTo2G2Tau_M-290', 'GluGluToRadionToHHTo2G2Tau_M-300', 'GluGluToRadionToHHTo2G2Tau_M-320', 'GluGluToRadionToHHTo2G2Tau_M-350', 'GluGluToRadionToHHTo2G2Tau_M-400', 'GluGluToRadionToHHTo2G2Tau_M-450', 'GluGluToRadionToHHTo2G2Tau_M-500', 'GluGluToRadionToHHTo2G2Tau_M-550', 'GluGluToRadionToHHTo2G2Tau_M-600', 'GluGluToRadionToHHTo2G2Tau_M-650', 'GluGluToRadionToHHTo2G2Tau_M-700', 'GluGluToRadionToHHTo2G2Tau_M-750', 'GluGluToRadionToHHTo2G2Tau_M-800', 'GluGluToRadionToHHTo2G2Tau_M-900', 'GluGluToRadionToHHTo2G2Tau_M-1000'],
+  #"Graviton": [f'{label}{MX}' for label in ["GluGluToBulkGravitonToHHTo2G2Tau_M-", "GluGluToBulkGravitonToHHTo2G2WTo2G2L2Nu_M-", "GluGluToBulkGravitonToHHTo2G2WTo2G2Q1L1Nu_M-"] for MX in [260, 270, 280, 300, 320, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000]],
+  #"Radion": [f'{label}{MX}' for label in ["GluGluToBulkRadionToHHTo2G2Tau_M-", "GluGluToBulkRadionToHHTo2G2WTo2G2L2Nu_M-", "GluGluToBulkRadionToHHTo2G2WTo2G2Q1L1Nu_M-"] for MX in [260, 270, 280, 300, 320, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000]],
+  "Graviton": [f'{label}{MX}' for label in ["GluGluToBulkGravitonToHHTo2G2Tau_M-"] for MX in [260, 270, 280, 300, 320, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000]],
+  "Radion": [f'{label}{MX}' for label in ["GluGluToRadionToHHTo2G2Tau_M-"] for MX in [260, 270, 280, 290, 300, 320, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000]],
   "NMSSM_Y_tautau": ['NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_600', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_700', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_800', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_600', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_50', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_600', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_700', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_90']
-  #"X_HH": ['XToHHggTauTau_M260', 'XToHHggTauTau_M270', 'XToHHggTauTau_M280', 'XToHHggTauTau_M290', 'XToHHggTauTau_M300', 'XToHHggTauTau_M320', 'XToHHggTauTau_M350', 'XToHHggTauTau_M400', 'XToHHggTauTau_M450', 'XToHHggTauTau_M500', 'XToHHggTauTau_M550', 'XToHHggTauTau_M600', 'XToHHggTauTau_M650', 'XToHHggTauTau_M700', 'XToHHggTauTau_M750', 'XToHHggTauTau_M800', 'XToHHggTauTau_M900', 'XToHHggTauTau_M1000'],
-  #"X_YH_Y_gg": ['NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_200', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_250', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_300', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_400', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_500', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_600', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_700', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_800', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_200', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_250', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_200', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_250', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_300', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_200', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_250', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_300', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_400', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_200', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_250', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_400', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_500', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_200', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_250', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_300', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_400', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_500', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_600', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_150', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_200', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_250', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_400', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_500', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_600', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_700', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_90'],
-  #"X_YH_Y_tautau" : ['NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_700', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_600', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_600', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_700', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_500', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_800_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_600', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_200', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_300', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_600_MY_250', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_400', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_90', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_80', 'NMSSM_XYH_Y_tautau_H_gg_MX_400_MY_150', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_1000_MY_800', 'NMSSM_XYH_Y_tautau_H_gg_MX_300_MY_70', 'NMSSM_XYH_Y_tautau_H_gg_MX_700_MY_100', 'NMSSM_XYH_Y_tautau_H_gg_MX_900_MY_125', 'NMSSM_XYH_Y_tautau_H_gg_MX_500_MY_90'],
-  #"X_YH_Y_gg_low_mass": ['NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_1000_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_300_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_400_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_500_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_600_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_700_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_800_MY_90', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_100', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_125', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_70', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_80', 'NMSSM_XYH_Y_gg_H_tautau_MX_900_MY_90']
 }
 #sig_procs["all"] = sig_procs["X_HH"] + sig_procs["X_YH_Y_gg"] + sig_procs["X_YH_Y_tautau"]
 if LOW_MASS_MODE:
@@ -82,24 +81,37 @@ if not LOW_MASS_MODE:
   bkg_procs = {
     'Diphoton': ['DiPhoton'],
     'GJets': ['GJets'],
-    'TT': ['TTGG', 'TTGamma', 'TTJets'],
+    #'TT': ['TTGG', 'TTGamma', 'TTJets'],
     'SM Higgs': ['VBFH_M125', 'VH_M125', 'ggH_M125', 'ttH_M125'],
-    'VGamma': ['WGamma', 'ZGamma']
+    'VGamma': ['WGamma', 'ZGamma', 'TTGG', 'TTGamma', 'TTJets']
+    #'VGamma': ['WGamma', 'ZGamma', 'TTGG']
   }
 else:
   bkg_procs = {
     #'Diphoton': ['DiPhoton40to80','DiPhoton'],
     'Diphoton': ['DiPhoton', "DiPhoton_Low"],
     'GJets': ['GJets'],
-    'TT': ['TTGG', 'TTGamma', 'TTJets'],
+    #'TT': ['TTGG', 'TTGamma', 'TTJets'],
     'SM Higgs': ['VBFH_M125', 'VH_M125', 'ggH_M125', 'ttH_M125'],
-    'VGamma': ['WGamma', 'ZGamma'],
+    'VGamma': ['WGamma', 'ZGamma', 'TTGG', 'TTGamma', 'TTJets'],
     'DY': ['DY'],
     'VV': ['WW', 'ZZ', 'WZ']
   }
 
 
 bkg_procs["all"] = [proc for key in bkg_procs.keys() for proc in bkg_procs[key]]
+
+bkg_procs_latex = {
+  "Diphoton": r"$\gamma\gamma$ + jets",
+  "GJets": r"$\gamma$ + jets",
+  "TT": r"$t\bar{t}$ + jets",
+  #"VGamma": r"$V + \gamma$",
+  "VGamma": r"$V + \gamma$" + " & " + r"$t\bar{t} + jets$",
+  #"SM Higgs": "Single Higgs",
+  "SM Higgs": "SM H",
+  "DY": "DY",
+  "VV": r"$VV$"
+}
 
 weights_systematics = ['weight_tau_idDeepTauVSe_sf_AnalysisTau_central', 'weight_tau_idDeepTauVSjet_sf_AnalysisTau_down', 'weight_muon_id_sfSTAT_SelectedMuon_down', 'weight_central_initial', 'weight_tau_idDeepTauVSjet_sf_AnalysisTau_up', 'weight_muon_iso_sfSTAT_SelectedMuon_down', 'weight_muon_id_sfSYS_SelectedMuon_central', 'weight_muon_iso_sfSYS_SelectedMuon_up', 'weight_electron_id_sf_SelectedElectron_up', 'weight_puWeight_up', 'weight_electron_id_sf_SelectedElectron_central', 'weight_tau_idDeepTauVSmu_sf_AnalysisTau_up', 'weight_muon_iso_sfSYS_SelectedMuon_down', 'weight_puWeight_down', 'weight_electron_id_sf_SelectedElectron_down', 'weight_central_no_lumi', 'weight_muon_id_sfSYS_SelectedMuon_up', 'weight_muon_id_sfSTAT_SelectedMuon_central', 'weight_tau_idDeepTauVSjet_sf_AnalysisTau_central', 'weight_trigger_sf_central', 'weight_electron_veto_sf_Diphoton_Photon_central', 'weight_muon_iso_sfSTAT_SelectedMuon_central', 'weight_L1_prefiring_sf_up', 'weight_electron_veto_sf_Diphoton_Photon_down', 'weight_muon_id_sfSTAT_SelectedMuon_up', 'weight_electron_veto_sf_Diphoton_Photon_up', 'weight_muon_iso_sfSYS_SelectedMuon_central', 'weight_puWeight_central', 'weight_L1_prefiring_sf_down', 'weight_muon_id_sfSYS_SelectedMuon_down', 'weight_muon_iso_sfSTAT_SelectedMuon_up', 'weight_trigger_sf_down', 'weight_trigger_sf_up', 'weight_tau_idDeepTauVSmu_sf_AnalysisTau_down', 'weight_L1_prefiring_sf_central', 'weight_tau_idDeepTauVSe_sf_AnalysisTau_down', 'weight_tau_idDeepTauVSmu_sf_AnalysisTau_central', 'weight_tau_idDeepTauVSe_sf_AnalysisTau_up']
 
@@ -128,8 +140,28 @@ train_features['svfit_investigation_visible'] = train_features['important_17_cor
 train_features['svfit_investigation_svfit'] = ["LeadPhoton_pt_mgg", "ditau_mass_SVFit", "SubleadPhoton_lead_lepton_dR", "ditau_dR_SVFit", "Diphoton_dPhi", "ditau_deta_SVFit", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "reco_MX_SVFit_mgg", "Diphoton_ditau_dR_SVFit", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi_SVFit", "dilep_leadpho_mass", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi_SVFit"]
 train_features['svfit_investigation_hybrid'] = ["LeadPhoton_pt_mgg", "ditau_mass_SVFit", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "ditau_dR_SVFit", "Diphoton_dPhi", "ditau_deta", "ditau_deta_SVFit", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "reco_MX_SVFit_mgg", "Diphoton_ditau_deta", "Diphoton_ditau_dR_SVFit", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "ditau_dphi_SVFit", "dilep_leadpho_mass", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi", "Diphoton_ditau_dphi_SVFit"]
 
+train_features['preapproval_half'] = train_features['preapproval'][:int(len(train_features['preapproval'])/2)]
 
-latex_dict = {'LeadPhoton_pt_mgg': r'$p_T^{\gamma_1}/m_{\gamma\gamma}$', 'ditau_mass': r'$m_{\tau\tau}$', 'SubleadPhoton_lead_lepton_dR': r'$\Delta R(\gamma_2, \tau_1)$', 'ditau_dR': r'$\Delta R(\tau\tau)$', 'Diphoton_dPhi': r'$\Delta\phi(\gamma\gamma)$', 'ditau_deta': r'$\Delta \eta(\tau\tau)$', 'LeadPhoton_lead_lepton_dR': r'$\Delta R(\gamma_1, \tau_1)$', 'Diphoton_pt_mgg': r'$p_T^{\gamma\gamma}/m_{\gamma\gamma}$', 'reco_MX_MET_mgg': r'$m(\gamma\gamma\tau\tau \mathrm{MET})/m_{\gamma\gamma}$', 'Diphoton_ditau_deta': r'$\Delta \eta(\gamma\gamma, \tau\tau)$', 'lead_lepton_mass': r'$m_{\tau_1}$', 'diphoton_met_dPhi': r'$\Delta \phi(\gamma\gamma, \mathrm{MET})$', 'ditau_pt': r'$p_T^{\tau\tau}$', 'category': r'$\mathrm{category}$', 'Diphoton_sublead_lepton_dR': r'$\Delta R(\gamma\gamma, \tau_2)$', 'MET_pt': r'$p_T^\mathrm{MET}$', 'jet_1_pt': r'$p_T^{j_1}$', 'ditau_dphi': r'$\Delta \phi(\tau\tau)$', 'dilep_leadpho_mass': r'$m(\tau\tau\gamma_1)$', 'lead_lepton_pt': r'$p_T^{\tau_1}$', 'ditau_met_dPhi': r'$\Delta \phi(\tau\tau, \mathrm{MET})$', 'Diphoton_lead_lepton_dR': r'$\Delta R(\gamma\gamma, \tau_1)$', 'LeadPhoton_ditau_dR': r'$\Delta R(\gamma_1, \tau\tau)$', 'Diphoton_lead_lepton_deta': r'$\Delta \eta(\gamma\gamma, \tau_1)$', 'Diphoton_sublead_lepton_deta': r'$\Delta \eta(\gamma\gamma, \tau_2)$', 'SubleadPhoton_pt_mgg': r'$p_T^{\gamma_2}/m_{\gamma\gamma}$', 'Diphoton_ditau_dphi': r'$\Delta \phi(\gamma\gamma, \tau\tau)$', 'Diphoton_mass': r'$m_{\gamma\gamma}$'}
+# testing the mgg sculpting
+# each row has one more feature removed
+train_features['preapproval_no_MX'] = ["LeadPhoton_pt_mgg", "ditau_mass", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "Diphoton_dPhi", "ditau_deta", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "Diphoton_ditau_deta", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "dilep_leadpho_mass", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi"]
+train_features['preapproval_no_dilep_leadpho_mass'] = ["LeadPhoton_pt_mgg", "ditau_mass", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "Diphoton_dPhi", "ditau_deta", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "Diphoton_ditau_deta", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi"]
+train_features['preapproval_no_Diphoton_dPhi'] = ["LeadPhoton_pt_mgg", "ditau_mass", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "ditau_deta", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "Diphoton_ditau_deta", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi"]
+train_features['preapproval_no_Diphoton_pt_mgg'] = ["LeadPhoton_pt_mgg", "ditau_mass", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "ditau_deta", "LeadPhoton_lead_lepton_dR", "Diphoton_ditau_deta", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi"]
+train_features['preapproval_no_dilep_leadpho_mass_w_MX'] = ["LeadPhoton_pt_mgg", "ditau_mass", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "Diphoton_dPhi", "ditau_deta", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "reco_MX_mgg", "Diphoton_ditau_deta", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi"]
+
+train_features['preapproval_dilep_leadpho_mass_mgg'] = ["LeadPhoton_pt_mgg", "ditau_mass", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "Diphoton_dPhi", "ditau_deta", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "Diphoton_ditau_deta", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "dilep_leadpho_mass_mgg", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi"]
+train_features['preapproval_dilep_leadpho_mass_rotate'] = ["LeadPhoton_pt_mgg", "ditau_mass", "SubleadPhoton_lead_lepton_dR", "ditau_dR", "Diphoton_dPhi", "ditau_deta", "LeadPhoton_lead_lepton_dR", "Diphoton_pt_mgg", "Diphoton_ditau_deta", "lead_lepton_mass", "diphoton_met_dPhi", "ditau_pt", "category", "Diphoton_sublead_lepton_dR", "MET_pt", "jet_1_pt", "ditau_dphi", "dilep_leadpho_mass_rotate", "lead_lepton_pt", "ditau_met_dPhi", "Diphoton_lead_lepton_dR", "LeadPhoton_ditau_dR", "Diphoton_lead_lepton_deta", "Diphoton_sublead_lepton_deta", "SubleadPhoton_pt_mgg", "Diphoton_ditau_dphi"]
+
+
+latex_dict = {'LeadPhoton_pt_mgg': r'$p_T^{\gamma_1}/m_{\gamma\gamma}$', 'ditau_mass': r'$m_{\tau\tau}$', 'SubleadPhoton_lead_lepton_dR': r'$\Delta R(\gamma_2, \tau_1)$', 'ditau_dR': r'$\Delta R(\tau\tau)$', 'Diphoton_dPhi': r'$\Delta\phi(\gamma\gamma)$', 'ditau_deta': r'$\Delta \eta(\tau\tau)$', 'LeadPhoton_lead_lepton_dR': r'$\Delta R(\gamma_1, \tau_1)$', 'Diphoton_pt_mgg': r'$p_T^{\gamma\gamma}/m_{\gamma\gamma}$', 'reco_MX_MET_mgg': r'$m(\gamma\gamma\tau\tau \mathrm{MET})/m_{\gamma\gamma}$', 'Diphoton_ditau_deta': r'$\Delta \eta(\gamma\gamma, \tau\tau)$', 'lead_lepton_mass': r'$m_{\tau_1}$', 'diphoton_met_dPhi': r'$\Delta \phi(\gamma\gamma, \mathrm{MET})$', 'ditau_pt': r'$p_T^{\tau\tau}$', 'category': r'$\mathrm{category}$', 'Diphoton_sublead_lepton_dR': r'$\Delta R(\gamma\gamma, \tau_2)$', 'MET_pt': r'$p_T^\mathrm{MET}$', 'jet_1_pt': r'$p_T^{j_1}$', 'ditau_dphi': r'$\Delta \phi(\tau\tau)$', 'dilep_leadpho_mass': r'$m(\tau\tau\gamma_1)$', 'lead_lepton_pt': r'$p_T^{\tau_1}$', 'ditau_met_dPhi': r'$\Delta \phi(\tau\tau, \mathrm{MET})$', 'Diphoton_lead_lepton_dR': r'$\Delta R(\gamma\gamma, \tau_1)$', 'LeadPhoton_ditau_dR': r'$\Delta R(\gamma_1, \tau\tau)$', 'Diphoton_lead_lepton_deta': r'$\Delta \eta(\gamma\gamma, \tau_1)$', 'Diphoton_sublead_lepton_deta': r'$\Delta \eta(\gamma\gamma, \tau_2)$', 'SubleadPhoton_pt_mgg': r'$p_T^{\gamma_2}/m_{\gamma\gamma}$', 'Diphoton_ditau_dphi': r'$\Delta \phi(\gamma\gamma, \tau\tau)$', 'Diphoton_mass': r'$m_{\gamma\gamma}$',
+              'b_jet_1_btagDeepFlavB':'Lead b-jet b-tag score', 'bdt_score':'BDT Score', 'dilep_subleadpho_mass': r'$m(\tau\tau\gamma_2)$', 'Diphoton_dR': r'$\Delta R(\gamma\gamma)$', 'Diphoton_eta': r'$\eta^{\gamma\gamma}$', 'Diphoton_helicity': r'$|\cos($helicity angle$(\gamma\gamma))|$', 'ditau_eta': r'$\eta^{\tau\tau}$', 'dR_ggtautau_SVFit': r'$\Delta R(\gamma\gamma, \tau\tau^\mathregular{SV Fit})$', 'dR_tautau_SVFit': r'$\Delta R(\tau\tau^{SV Fit})$', 'eta_tautau_SVFit_bdt': r'$\eta^{\tau\tau} \mathrm{SV Fit}$', 'gg_tt_CS': r'$\cos \theta^{CS} (\tau\tau^{SV Fit}, \gamma\gamma)$', 'gg_tt_hel': r'$|\cos($helicity angle$(\gamma\gamma, \tau\tau))|$', 'jet_1_btagDeepFlavB': 'Lead jet b-tag score', 'jet_1_eta': r'$\eta^{j_1}$', 'jet_2_btagDeepFlavB': 'Sublead jet b-tag score', 'jet_2_eta': r'$\eta^{j_2}$', 'jet_2_pt': r'$p_T^{j_2}$', 'lead_lepton_eta': r'$\eta^{\tau_1}$', 'lead_lepton_met_dphi': r'$\Delta\phi (\tau_1, \mathrm{MET})$', 'LeadPhoton_eta': r'$\eta^{\gamma_1}$', 'LeadPhoton_pixelSeed': r'$\gamma_1 \mathrm{Pixel Seed}$', 'm_tautau_SVFit': r'$m_{\tau\tau}^{SV Fit}$', 'MET_ll_dPhi': r'$\Delta\phi (\tau\tau, \mathrm{MET})$', 'mX': r'$m_X$', 'n_bjets': r'$N_{\mathrm{b-jets}}$', 'n_electrons': r'$N_e$', 'n_iso_tracks': r'$N_\mathrm{iso tracks}$', 'n_jets': r'$N_j$', 'n_muons': r'$N_\mu$', 'n_taus': r'$N_\tau$', 'pt_tautau_SVFit': r'$p_T^{\tau\tau} SV Fit}$', 'sublead_lepton_eta': r'$\eta^{\tau_2}$', 'sublead_lepton_pt': r'$p_T^{\tau_2}$', 'SubleadPhoton_eta':r'$\eta^{\gamma_2}$', 'SubleadPhoton_pixelSeed': r'$\gamma_2 \mathrm{pixel seed}$',
+              'reco_MX_mgg': r'$m(\gamma\gamma\tau\tau) / m_{\gamma\gamma}$',
+              'reco_MX': r'$m(\gamma\gamma\tau\tau)$',
+              'reco_MggtauMET_mgg': r'$m(\gamma\gamma\tau\mathrm{MET}) / m_{\gamma\gamma}$',
+              'Diphoton_lead_lepton_dphi': r'$\Delta\phi(\gamma\gamma, \tau_1)$',
+              'Diphoton_sublead_lepton_dphi': r'$\Delta\phi(\gamma\gamma, \tau_2)$',
+              'reco_MX_mgg': r'$m(\gamma\gamma\tau\tau) / m_{\gamma\gamma}$',}
 
 import fnmatch
 def expandSigProcs(sig_procs_to_expand):
@@ -143,6 +175,15 @@ def expandSigProcs(sig_procs_to_expand):
     
   return expanded_sig_procs
 
+def expandColumns(columns):
+  expanded_columns = []
+  for col in columns:
+    if col in train_features:
+      expanded_columns.extend(train_features[col])
+    else:
+      expanded_columns.append(col)
+  return expanded_columns
+
 def get_MX_MY(sig_proc):
   if "NMSSM" in sig_proc:
     split_name = sig_proc.split("_")
@@ -151,7 +192,7 @@ def get_MX_MY(sig_proc):
   elif "XToHHggTauTau" in sig_proc:
     MX = float(sig_proc.split("_")[1][1:])
     MY = 125.0
-  elif "HHTo2G2Tau" in sig_proc:
+  elif "HHTo2G" in sig_proc:
     MX = float(sig_proc.split("-")[1])
     MY = 125.0
   else:
@@ -244,12 +285,31 @@ def submitToBatch(argv, extra_memory=False, quick=False):
   else:
     slots = extra_memory
 
-  if not quick:  submit_command = f"qsub -q hep.q -l h_vmem=24G -l h_rt=3:0:0 -pe hep.pe {slots} -o {script_path}.out -e {script_path}.err {script_path}"
-  else:          submit_command = f"qsub -q hep.q -l h_vmem=24G -l h_rt=600 -o {script_path}.out -e {script_path}.err {script_path}"
+  #if not quick:  submit_command = f"qsub -q hep.q -l h_vmem=24G -l h_rt=3:0:0 -pe hep.pe {slots} -o {script_path}.out -e {script_path}.err {script_path}"
+  #else:          submit_command = f"qsub -q hep.q -l h_vmem=24G -l h_rt=600 -o {script_path}.out -e {script_path}.err {script_path}"
   #if not quick:  submit_command = f"qsub -q gpu.q -l h_vmem=24G -l h_rt=3:0:0 -pe hep.pe {slots} -o {script_path}.out -e {script_path}.err {script_path}"
   #else:          submit_command = f"qsub -q gpu.q -l h_vmem=24G -l h_rt=600 -o {script_path}.out -e {script_path}.err {script_path}"
-  print(submit_command)
-  os.system(submit_command)
+  #print(submit_command)
+  #os.system(submit_command)
+
+  sub = {
+          "executable": f"{script_path}",
+          "max_retries": "1",
+          "log": f"{script_path}.log",
+          "output": f"{script_path}.out",
+          "error": f"{script_path}.err",
+          "+MaxRuntime": 3600,
+          "+OS": '"EL7"',
+          "request_memory": "8G",
+          "request_cpus" : slots,
+  }
+  with open(f"{script_path}.sub", "w") as f:
+    lines = [f"{key} = {value}" for key, value in sub.items()]
+    lines.append("queue")
+    f.write("\n".join(lines))
+  
+  #schedd = htcondor.Schedd()
+  #schedd.submit(sub)
 
 from pyarrow.parquet import ParquetFile
 def getColumns(parquet_file):

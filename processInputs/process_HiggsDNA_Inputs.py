@@ -5,6 +5,7 @@ import json
 import common
 import mass_variables
 import sys
+import tauID
 
 import tracemalloc
 get_memory = lambda: np.array(tracemalloc.get_traced_memory())/1024**3
@@ -96,6 +97,18 @@ def add_MET_variables(df):
   df["sublead_lepton_met_dPhi"] = dphi(df.MET_phi, df.sublead_lepton_phi)
   df.loc[df.category==8, "sublead_lepton_met_dPhi"] = common.dummy_val
 
+def add_ditau_phi(df):
+  print(">> Adding ditau phi")
+  tau1_px = df.lead_lepton_pt * np.cos(df.lead_lepton_phi)
+  tau1_py = df.lead_lepton_pt * np.sin(df.lead_lepton_phi)
+  tau2_px = df.sublead_lepton_pt * np.cos(df.sublead_lepton_phi)
+  tau2_py = df.sublead_lepton_pt * np.sin(df.sublead_lepton_phi)
+
+  ditau_px = tau1_px + tau2_px
+  ditau_py = tau1_py + tau2_py
+  df["ditau_phi"] = np.arctan2(ditau_py, ditau_px)
+  df.loc[df.category==8, "ditau_phi"] = common.dummy_val
+
 def applyPixelVeto(df):
   print(">> Applying Pixel Veto")
   pixel_veto = (df.LeadPhoton_pixelSeed==0) & (df.SubleadPhoton_pixelSeed==0)
@@ -113,18 +126,6 @@ def checkNanAndInf(df):
     df.drop(df.index[row_containing_null_selection], axis=0, inplace=True)
 
   #assert not df.isnull().any().any(), print("> Offending columns:\n"+str(df.isnull().sum()[df.isnull().sum()>0])) 
-
-def add_ditau_phi(df):
-  print(">> Adding ditau phi")
-  tau1_px = df.lead_lepton_pt * np.cos(df.lead_lepton_phi)
-  tau1_py = df.lead_lepton_pt * np.sin(df.lead_lepton_phi)
-  tau2_px = df.sublead_lepton_pt * np.cos(df.sublead_lepton_phi)
-  tau2_py = df.sublead_lepton_pt * np.sin(df.sublead_lepton_phi)
-
-  ditau_px = tau1_px + tau2_px
-  ditau_py = tau1_py + tau2_py
-  df["ditau_phi"] = np.arctan2(ditau_py, ditau_px)
-  df.loc[df.category==8, "ditau_phi"] = common.dummy_val
 
 def selectSigProcs(df, proc_dict, sig_procs):
   print(">> Filtering signal processes")
@@ -147,12 +148,13 @@ def memEfficientRead(parquet_input, columns=None):
   """
   Reads parquet one columns at a time and converts any float64 to float32
   """
-  print(">> Reading parquet file")
+  print(">> Reading parquet file", flush=True)
   dfs = []
   if columns == None:
     columns = common.getColumns(parquet_input)
   
-  for col in columns:
+  for col in (columns):
+    print(col, flush=True)
     df = pd.read_parquet(parquet_input, columns=[col])
     if df[col].dtype == "float64":
       df = df.astype("float32")
@@ -161,18 +163,62 @@ def memEfficientRead(parquet_input, columns=None):
       df.loc[df.year==b"2016UL_pre", "year"] = "2016"
       df.loc[df.year==b"2016UL_pos", "year"] = "2016"
       df = df.astype("uint16")
-    elif col == "process_id":
+    if col == "process_id":
       df = df.astype("int16")
     elif col == "category":
       df = df.astype("uint8")
     elif (col.split("_")[-1] == "id") or (col.split("_")[-1] == "charge"):
       df = df.astype("int8")
-
+      
     dfs.append(df)
 
   df = pd.concat(dfs, axis=1)
+  df.reset_index(inplace=True)
 
   return df
+
+
+# def memEfficientRead(parquet_input, columns=None):
+#   """
+#   Reads parquet one columns at a time and converts any float64 to float32
+#   """
+#   print(">> Reading parquet file", flush=True)
+#   if columns == None:
+#     columns = common.getColumns(parquet_input)
+
+#   print("Reading parquet...", flush=True)
+#   df = pd.read_parquet(parquet_input, columns=columns)
+#   df.info()
+#   print("Read", flush=True)
+  
+#   for i, col in enumerate((df.columns)):
+#     print(i, col, flush=True)
+#     print(df[col].dtype, flush=True)
+#     assert not df[col].isna().any()
+#     print("finish check")
+
+#     if df[col].dtype == "float64":
+#       print("Converting to float32", flush=True)
+#       df[col] = df[col].astype("float32")
+
+#     if col == "year":
+#       print(1)
+#       df.loc[df.year==b"2016UL_pre", "year"] = "2016"
+#       df.loc[df.year==b"2016UL_pos", "year"] = "2016"
+#       df[col] = df[col].astype("uint16")
+#     if col == "process_id":
+#       print(2)
+#       df[col] = df[col].astype("int16")
+#     elif col == "category":
+#       print(3)
+#       df[col] = df[col].astype("uint8")
+#     elif (col.split("_")[-1] == "id") or (col.split("_")[-1] == "charge"):
+#       print(4)
+#       df[col] = df[col].astype("int8")
+
+#     print("here")
+
+#   return df
 
 def dropUnwantedFeatures(df, keep_features):
   if keep_features != None:
@@ -251,17 +297,6 @@ def main(parquet_input, parquet_output, summary_input, do_test, keep_features, s
     df = applyPixelVeto(df)
   if remove_out_of_sync:
     out_of_sync_s = (df.category != 8) & (df.ditau_mass == common.dummy_val)
-
-    # cats, n_total = np.unique(df.loc[df.category!=8, "category"], return_counts=True)
-    # cats, n_out_of_sync = np.unique(df.loc[out_of_sync_s, "category"], return_counts=True)
-    # print(pd.DataFrame({"cat":cats, "frac out of sync":(n_out_of_sync/n_total)}))
-
-    # proc1, n_total = np.unique(df.loc[df.category!=8, "process_id"], return_counts=True)
-    # proc2, n_out_of_sync = np.unique(df.loc[out_of_sync_s, "process_id"], return_counts=True)
-    # proc_diff = list(set(proc1).symmetric_difference(proc2))
-    # n_total = n_total[~np.isin(proc1, proc_diff)]
-    # print(pd.DataFrame({"proc":proc2, "frac out of sync":(n_out_of_sync/n_total)}))
-
     df = df[~out_of_sync_s]
 
   print(">> Adding MX and MY values")
@@ -283,8 +318,6 @@ def main(parquet_input, parquet_output, summary_input, do_test, keep_features, s
 
   dropUnwantedFeatures(df, keep_features)
 
-  checkNanAndInf(df)
-
   print(">> Columns to output w/o weights:\n "+"\n ".join(sorted(df.columns)))
 
   # load in all the weights
@@ -293,7 +326,22 @@ def main(parquet_input, parquet_output, summary_input, do_test, keep_features, s
     dfw = memEfficientRead(parquet_input, columns=wcols)
   else:
     dfw = common.getTestSample(parquet_input, columns=wcols)
-  dfw = dfw.loc[df.index]
+  
+  print("Finded dropped", flush=True)
+  print(df.index.is_unique)
+  print(dfw.index.is_unique)
+  dropped_indices = set(dfw.index).difference(df.index)
+  print("Dropping indices")
+  dfw.drop(index = dropped_indices, inplace=True)
+
+  print("Reindexing", flush=True)
+  #dfw = dfw.loc[df.index]
+  print(df)
+  print(dfw)
+  assert (df.index == dfw.index).all()
+  print("Finished reindexing", flush=True)
+
+  checkNanAndInf(df)
 
   if undo_LHE_weights:
     lhe_cols = list(filter(lambda x: "lhe" in x, wcols))

@@ -72,12 +72,14 @@ plt.xlim(-15, 20)
 plt.ylim(9, 2e5)
 plt.yscale("log")
 
-mplhep.cms.label(llabel="", data=True, lumi=common.tot_lumi, loc=2)
+plt.savefig("test.png")
 
-plt.savefig("kl_paper.pdf")
-plt.savefig("kl_paper.png")
+# mplhep.cms.label(llabel="", data=True, lumi=common.tot_lumi, loc=2)
 
-mplhep.cms.label(llabel="Preliminary", data=True, lumi=common.tot_lumi, loc=2)
+# plt.savefig("kl_paper.pdf")
+# plt.savefig("kl_paper.png")
 
-plt.savefig("kl_prelim.pdf")
-plt.savefig("kl_prelim.png")
+# mplhep.cms.label(llabel="Preliminary", data=True, lumi=common.tot_lumi, loc=2)
+
+# plt.savefig("kl_prelim.pdf")
+# plt.savefig("kl_prelim.png")
